@@ -2,26 +2,43 @@ import logo from "../assets/logo.svg";
 import cartIcon from "../assets/icon-cart.svg";
 import avatar from "../assets/image-avatar.png";
 
+const navLinks = ['Collections', 'Men', 'Women', 'About', 'Contact'];
+
 function Header() {
 
     return (
-        <header className="flex items-center justify-between px-6 max-w-6xl mx-auto border-b border-[#E4E9F2] h-[83px] mt-8 pb-10">
-            <div className="flex items-center gap-[56px]">
+        <header>
+            <div className="max-w-[1110px] mx-auto flex items-center border-b border-gblue/40 px-6">
 
-                <img className="w-[137.5px] h-auto" src={logo} alt="logo" />
-                
-                <div className="flex items-center gap-[32px] font-kumbh text-[15px] font-normal leading-[26px] tracking-[0px] text-[#69707D]">
-                    <a href="#">Collections</a>
-                    <a href="#">Men</a>
-                    <a href="#">Women</a>
-                    <a href="#">About</a>
-                    <a href="#">Contact</a>
+                {/* Left: logo + nav */}
+                <div className="flex items-center gap-14">
+                    <img src={logo} alt="Sneakers" />
+                    <nav className="flex gap-8">
+                        {navLinks.map((link) => (
+                            <a key={link}
+                               href="#"
+                               className="text-dgblue py-10 border-b-4 border-transparent hover:text-vdblue hover:border-orange transition-colors"
+                            >
+                                {link}
+                            </a>
+                        ))}
+                    </nav>
                 </div>
     
-            </div>
-            <div className="flex items-center gap-[48px]">
-                <img src={cartIcon} alt="cart image" />
-                <img className="w-[50px] h-[50px]" src={avatar} alt="avatar image" />
+                {/* Right: cart + avatar */}
+                <div className="ml-auto flex items-center gap-11">
+                    <button
+                        aria-label="Cart"
+                        className="text-dgblue hover:text-vdblue transition-colors"
+                    >
+                        <img src={cartIcon} alt="" className="w-6" />
+                    </button>
+                    <img 
+                        src={avatar}
+                        alt="Profile"
+                        className="w-12 h-12 rounded-full cursor-pointer hover:ring-2 hover:ring-orange transition"
+                    />
+                </div>
             </div>
         </header>
     )
