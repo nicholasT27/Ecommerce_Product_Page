@@ -17,8 +17,6 @@ function ProductDetails() {
                 the weather can offer.
             </p>
 
-            <p className="mt-6">$125.00</p>
-
             <div className="mt-6">
                 <div className="flex items-center gap-4">
                     <span className="text-3xl font-bold">$125.00</span>
