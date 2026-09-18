@@ -2,9 +2,9 @@ import minusIcon from "../assets/icon-minus.svg";
 import plusIcon from "../assets/icon-plus.svg";
 
 
-function QuantitySelector ({value, onChange}) {
+function QuantitySelector ({value, onChange, max = Infinity}) {
     const decrement = () => onChange(Math.max(0, value - 1));
-    const increment = () => onChange(value + 1);
+    const increment = () => onChange(Math.min(max, value + 1));
 
     return (
     <div className="flex items-center justify-between bg-lgblue rounded-xl px-4 py-4 w-full">

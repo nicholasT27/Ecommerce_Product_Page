@@ -1,21 +1,13 @@
 import { useState } from 'react';
 
-import product1Thumbnail from "../assets/image-product-1-thumbnail.jpg";
-import product2Thumbnail from "../assets/image-product-2-thumbnail.jpg";
-import product3Thumbnail from "../assets/image-product-3-thumbnail.jpg";
-import product4Thumbnail from "../assets/image-product-4-thumbnail.jpg";
-import productimg1 from "../assets/image-product-1.jpg";
-import productimg2 from "../assets/image-product-2.jpg";
-import productimg3 from "../assets/image-product-3.jpg";
-import productimg4 from "../assets/image-product-4.jpg";
+import { productImages, productThumbs } from '../lib/assets';
 import prevIcon from "../assets/icon-previous.svg";
 import nextIcon from "../assets/icon-next.svg";
 
-const images = [productimg1, productimg2, productimg3, productimg4]
-const thumbs = [product1Thumbnail, product2Thumbnail, product3Thumbnail, product4Thumbnail];
-
-function ProductGallery() {
+function ProductGallery({ product }) {
     const [active, setActive] = useState(0);
+    const images = productImages(product.imageSet);
+    const thumbs = productThumbs(product.imageSet);
 
     const prev = () => setActive((active - 1 + images.length) % images.length);
 
@@ -26,9 +18,9 @@ function ProductGallery() {
             {/* Main image + mobile arrows */}
             <div className="relative">
                 <img
-                    className="w-full rounded-2xl"
+                    className="w-full lg:rounded-2xl"
                     src={images[active]}
-                    alt={`Product ${active + 1}`}
+                    alt={`${product.name}, view ${active + 1}`}
                 />
 
             {/* Mobile-only arrows */}
@@ -76,4 +68,3 @@ function ProductGallery() {
 }
 
 export default ProductGallery;
-

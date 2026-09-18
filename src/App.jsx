@@ -1,20 +1,30 @@
-import Header from "./components/Header";
-import ProductDetails from "./components/ProductDetails";
-import ProductGallery from "./components/ProductGallery";
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Header from './components/Header';
+import { StoreProvider, useStore } from './context/StoreContext';
+import CatalogPage from './pages/CatalogPage';
+import ProductPage from './pages/ProductPage';
+import CartPage from './pages/CartPage';
+import WishlistPage from './pages/WishlistPage';
+import CheckoutPage from './pages/CheckoutPage';
+import ConfirmationPage from './pages/ConfirmationPage';
+import AccountPage from './pages/AccountPage';
 
-function App() {
-
-  return (
-    <div className="font-kumbh text-vdblue min-h-screen">
-        <Header />
-        <main className="lg:max-w-[1110px] mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-[125px] lg:px-6 lg:py-24">
-          <ProductGallery />
-          <div className="px-6 py-6 lg:p-0">
-             <ProductDetails />
-          </div>
-        </main>
-    </div>
-  )
+function Shell() {
+  const { notice, setNotice } = useStore();
+  return <div className="font-kumbh text-vdblue min-h-screen bg-white">
+    <Header />
+    {notice && <button onClick={() => setNotice('')} className="fixed z-50 bottom-5 left-1/2 -translate-x-1/2 bg-vdblue text-white px-5 py-3 rounded-xl shadow-xl text-sm">{notice}</button>}
+    <Routes>
+      <Route path="/" element={<CatalogPage />} />
+      <Route path="/collections/:category" element={<CatalogPage />} />
+      <Route path="/product/:slug" element={<ProductPage />} />
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/wishlist" element={<WishlistPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/order/:orderNumber" element={<ConfirmationPage />} />
+      <Route path="/account" element={<AccountPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </div>;
 }
-
-export default App
+export default function App() { return <BrowserRouter><StoreProvider><Shell /></StoreProvider></BrowserRouter>; }

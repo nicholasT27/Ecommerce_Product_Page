@@ -1,16 +1,58 @@
-# React + Vite
+# Sneakers demo store
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive, full-stack ecommerce prototype expanded from the original product-page challenge. The existing visual language, desktop product layout, mobile gallery, and hamburger navigation are preserved while the experience now supports browsing through simulated order confirmation.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19, React Router, Vite, and Tailwind CSS
+- Express REST API
+- SQLite via `better-sqlite3`
+- Vitest and Supertest for API tests
 
-## React Compiler
+## Run locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+The storefront runs at `http://localhost:5173`; Vite proxies API requests to the Express server at `http://localhost:3001`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For a production-style run:
+
+```bash
+npm run build
+npm start
+```
+
+Express serves both the API and built frontend at `http://localhost:3001`.
+
+## Demo database
+
+The SQLite database is created automatically at `server/data/store.db` and seeded on first run. Reset it at any time with:
+
+```bash
+npm run db:reset
+```
+
+The schema contains categories, products, a demo user, cart and wishlist items, orders, and immutable order line items. The app uses one simulated signed-in user (`alex@example.com`) so the full flow works without authentication setup.
+
+## Available flows
+
+- Browse seeded catalog and category pages
+- Search, sort, and filter by stock
+- View responsive product galleries and live inventory
+- Add, update, and remove cart items with stock validation
+- Save and remove wishlist items
+- Complete a no-payment checkout that reserves inventory and creates an order
+- View confirmation details and demo account order history
+
+No payment details are collected and no payment gateway is integrated.
+
+## Quality checks
+
+```bash
+npm run lint
+npm test
+npm run build
+```
