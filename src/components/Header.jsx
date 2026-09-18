@@ -8,7 +8,7 @@ import closeIcon from '../assets/icon-close.svg';
 import CartDrawer from './CartDrawer';
 import { useStore } from '../context/StoreContext';
 
-const navLinks = [['Collections', '/collections/collections'], ['Men', '/collections/men'], ['Women', '/collections/women'], ['Wishlist', '/wishlist'], ['About', '/#about']];
+const navLinks = [['Collections', '/collections/collections'], ['Men', '/collections/men'], ['Women', '/collections/women'], ['Wishlist', '/wishlist'], ['About', '/about']];
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { cartCount, cartOpen, setCartOpen } = useStore();

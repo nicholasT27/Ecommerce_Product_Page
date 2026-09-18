@@ -8,6 +8,7 @@ import WishlistPage from './pages/WishlistPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ConfirmationPage from './pages/ConfirmationPage';
 import AccountPage from './pages/AccountPage';
+import AboutPage from './pages/AboutPage';
 
 function Shell() {
   const { notice, setNotice } = useStore();
@@ -23,6 +24,7 @@ function Shell() {
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/order/:orderNumber" element={<ConfirmationPage />} />
       <Route path="/account" element={<AccountPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </div>;
