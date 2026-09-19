@@ -62,9 +62,14 @@ app.delete('/api/wishlist/:productId', (req, res) => {
   res.json({ ok: true });
 });
 app.get('/api/account', (_req, res) => {
-  const user = db.prepare('SELECT id, name, email FROM users WHERE id=?').get(userId);
+  const user = db.prepare('SELECT id, name, email, phone, address, city, postal_code postalCode FROM users WHERE id=?').get(userId);
   const orders = db.prepare('SELECT * FROM orders WHERE user_id=? ORDER BY id DESC').all(userId).map((o) => ({ ...o, total: (o.subtotal_cents + o.shipping_cents) / 100 }));
   res.json({ ...user, orders });
+});
+app.patch('/api/account', (req, res) => {
+  const { fullName = '', phone = '', address = '', city = '', postalCode = '' } = req.body;
+  db.prepare('UPDATE users SET name=?, phone=?, address=?, city=?, postal_code=? WHERE id=?').run(fullName, phone, address, city, postalCode, userId);
+  res.json({ name: fullName, phone, address, city, postalCode });
 });
 app.get('/api/orders/:orderNumber', (req, res) => {
   const order = db.prepare('SELECT * FROM orders WHERE order_number=? AND user_id=?').get(req.params.orderNumber, userId);

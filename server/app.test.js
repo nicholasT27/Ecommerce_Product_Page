@@ -21,4 +21,15 @@ describe('store API', () => {
     const response = await request(app).post('/api/orders').send({ customerName: 'Alex' });
     expect(response.status).toBe(400);
   });
+  it('saves and returns customer profile details', async () => {
+    await request(app).patch('/api/account').send({
+      fullName: 'Alex Morgan', phone: '555-0100', address: '27 Orange Street',
+      city: 'Portland', postalCode: '97205',
+    }).expect(200);
+    const response = await request(app).get('/api/account').expect(200);
+    expect(response.body).toMatchObject({
+      name: 'Alex Morgan', phone: '555-0100', address: '27 Orange Street',
+      city: 'Portland', postalCode: '97205',
+    });
+  });
 });

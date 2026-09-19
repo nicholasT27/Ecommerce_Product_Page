@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageTitle from '../components/PageTitle';
+import AuthForm from '../components/AuthForm';
+import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { api } from '../lib/api';
 import { money } from '../lib/assets';
@@ -8,10 +10,25 @@ import { money } from '../lib/assets';
 const fields = [['customerName', 'Full name'], ['email', 'Email address'], ['address', 'Street address'], ['city', 'City'], ['postalCode', 'Postal code']];
 export default function CheckoutPage() {
   const { cart, subtotal, refresh } = useStore(); const navigate = useNavigate();
-  const [form, setForm] = useState({ customerName: 'Alex Morgan', email: 'alex@example.com', address: '27 Orange Street', city: 'Portland', postalCode: '97205' });
+  const { configured, user, loading } = useAuth();
+  const [form, setForm] = useState(configured
+    ? { customerName: '', email: '', address: '', city: '', postalCode: '' }
+    : { customerName: 'Alex Morgan', email: 'alex@example.com', address: '27 Orange Street', city: 'Portland', postalCode: '97205' });
   const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const shipping = subtotal >= 100 ? 0 : 8;
+  useEffect(() => {
+    if (!configured || !user) return;
+    api('/account').then((account) => setForm({
+      customerName: account.name || '',
+      email: account.email || user.email || '',
+      address: account.address || '',
+      city: account.city || '',
+      postalCode: account.postalCode || '',
+    })).catch((requestError) => setError(requestError.message));
+  }, [configured, user]);
   const submit = async (e) => { e.preventDefault(); setBusy(true); setError(''); try { const result = await api('/orders', { method: 'POST', body: JSON.stringify(form) }); await refresh(); navigate(`/order/${result.orderNumber}`); } catch (err) { setError(err.message); } finally { setBusy(false); } };
+  if (loading) return <p className="text-center py-24">Loading checkout…</p>;
+  if (configured && !user) return <main><PageTitle eyebrow="Checkout" title="Sign in to continue">Your account securely connects this cart and order to you.</PageTitle><div className="max-w-[1110px] mx-auto px-6 py-10"><AuthForm /></div></main>;
   if (!cart.length) return <main><PageTitle title="Checkout" /><div className="max-w-[1110px] mx-auto px-6 py-10"><div className="bg-lgblue rounded-2xl p-12 text-center"><p>Your cart is empty.</p><Link to="/" className="text-orange font-bold mt-4 inline-block">Return to shop</Link></div></div></main>;
   return <main><PageTitle eyebrow="Demo checkout" title="Complete your order">No payment details are requested or processed.</PageTitle><form onSubmit={submit} className="max-w-[1110px] mx-auto px-6 py-10 grid lg:grid-cols-[1fr_360px] gap-10"><section><h2 className="text-xl font-bold mb-5">Delivery details</h2><div className="grid sm:grid-cols-2 gap-4">{fields.map(([name, label], i) => <label key={name} className={i === 2 ? 'sm:col-span-2' : ''}><span className="font-bold text-sm block mb-2">{label}</span><input required type={name === 'email' ? 'email' : 'text'} value={form[name]} onChange={(e) => setForm({ ...form, [name]: e.target.value })} className="w-full border border-gblue rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange" /></label>)}</div><div className="mt-8 border border-orange/40 bg-pale-orange rounded-xl p-5"><h3 className="font-bold">Payment simulation</h3><p className="text-sm text-dgblue mt-1">This prototype skips the payment gateway. Placing the order reserves inventory and creates a confirmed demo order.</p></div>{error && <p className="text-red-600 mt-4">{error}</p>}</section><aside className="bg-lgblue rounded-2xl p-6 h-fit"><h2 className="text-xl font-bold">Review</h2>{cart.map((item) => <p key={item.id} className="flex justify-between gap-4 mt-4 text-sm"><span>{item.name} × {item.quantity}</span><b>{money(item.price * item.quantity)}</b></p>)}<div className="border-t border-gblue/40 mt-5 pt-5"><p className="flex justify-between"><span>Subtotal</span><span>{money(subtotal)}</span></p><p className="flex justify-between mt-2"><span>Shipping</span><span>{shipping ? money(shipping) : 'Free'}</span></p><p className="flex justify-between text-xl font-bold mt-4"><span>Total</span><span>{money(subtotal + shipping)}</span></p></div><button disabled={busy} className="w-full bg-orange rounded-xl py-4 font-bold mt-6 disabled:opacity-60">{busy ? 'Creating order…' : 'Place demo order'}</button></aside></form></main>;
 }

@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import { StoreProvider, useStore } from './context/StoreContext';
+import { AuthProvider } from './context/AuthContext';
 import CatalogPage from './pages/CatalogPage';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
@@ -29,4 +30,4 @@ function Shell() {
     </Routes>
   </div>;
 }
-export default function App() { return <BrowserRouter><StoreProvider><Shell /></StoreProvider></BrowserRouter>; }
+export default function App() { return <BrowserRouter><AuthProvider><StoreProvider><Shell /></StoreProvider></AuthProvider></BrowserRouter>; }

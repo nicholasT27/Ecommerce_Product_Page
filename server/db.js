@@ -23,7 +23,9 @@ db.exec(`
     FOREIGN KEY(category_id) REFERENCES categories(id)
   );
   CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL
+    id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL,
+    phone TEXT NOT NULL DEFAULT '', address TEXT NOT NULL DEFAULT '',
+    city TEXT NOT NULL DEFAULT '', postal_code TEXT NOT NULL DEFAULT ''
   );
   CREATE TABLE IF NOT EXISTS cart_items (
     user_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER NOT NULL,
@@ -48,6 +50,12 @@ db.exec(`
     FOREIGN KEY(order_id) REFERENCES orders(id), FOREIGN KEY(product_id) REFERENCES products(id)
   );
 `);
+
+// Existing demo databases predate the editable profile fields.
+const userColumns = new Set(db.prepare('PRAGMA table_info(users)').all().map((column) => column.name));
+for (const column of ['phone', 'address', 'city', 'postal_code']) {
+  if (!userColumns.has(column)) db.exec(`ALTER TABLE users ADD COLUMN ${column} TEXT NOT NULL DEFAULT ''`);
+}
 
 export function seed() {
   const count = db.prepare('SELECT COUNT(*) count FROM products').get().count;
