@@ -10,13 +10,14 @@ const values = [
 
 export default function AboutPage() {
   return <main>
+    {/* Company introduction and primary shopping paths */}
     <section className="max-w-[1110px] mx-auto px-6 py-10 lg:py-20 grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
       <div>
         <p className="text-orange text-sm font-bold tracking-widest uppercase">Our story</p>
         <h1 className="text-4xl lg:text-6xl font-bold leading-tight mt-4">Good sneakers take you somewhere.</h1>
         <p className="text-dgblue leading-relaxed mt-6 max-w-xl">Founded in Portland in 2021, Sneakers Supply Co. began with a simple idea: finding an everyday pair should feel exciting, not overwhelming. We bring together comfortable classics and expressive limited editions designed for life in motion.</p>
         <div className="flex flex-col sm:flex-row gap-3 mt-8">
-          <Link to="/" className="bg-orange text-vdblue rounded-xl px-7 py-4 text-center font-bold hover:bg-orange/70 transition">Explore the collection</Link>
+          <Link to="/collections/collections" className="bg-orange text-vdblue rounded-xl px-7 py-4 text-center font-bold hover:bg-orange/70 transition">Explore the collection</Link>
           <Link to="/collections/men" className="border border-gblue rounded-xl px-7 py-4 text-center font-bold hover:border-orange hover:text-orange transition">Shop everyday styles</Link>
         </div>
       </div>
@@ -29,6 +30,7 @@ export default function AboutPage() {
       </div>
     </section>
 
+    {/* Brand principles */}
     <section className="bg-vdblue text-white mt-8 lg:mt-12">
       <div className="max-w-[1110px] mx-auto px-6 py-14 lg:py-20">
         <p className="text-orange text-sm font-bold tracking-widest uppercase">What guides us</p>
@@ -36,11 +38,13 @@ export default function AboutPage() {
       </div>
     </section>
 
+    {/* Founder story and company snapshot */}
     <section className="max-w-[1110px] mx-auto px-6 py-14 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
       <img src={detailImage} alt="Minimal sneaker balanced on stones" className="w-full aspect-[4/3] object-cover rounded-2xl" />
       <div><p className="text-orange text-sm font-bold tracking-widest uppercase">Who we are</p><h2 className="text-3xl lg:text-4xl font-bold mt-3">A small team with a big love for everyday footwear.</h2><p className="text-dgblue leading-relaxed mt-5">Co-founders Maya Chen and Daniel Brooks met while working in independent retail. Together they built Sneakers Supply Co. around thoughtful curation, friendly service, and the belief that the best shoes are the ones you actually wear.</p><dl className="grid grid-cols-2 gap-5 mt-8"><div className="bg-lgblue rounded-xl p-5"><dt className="text-dgblue text-sm">Headquarters</dt><dd className="font-bold mt-1">Portland, Oregon</dd></div><div className="bg-lgblue rounded-xl p-5"><dt className="text-dgblue text-sm">Team</dt><dd className="font-bold mt-1">12 sneaker people</dd></div></dl></div>
     </section>
 
+    {/* Fictional contact and registration details used by this demo */}
     <section className="max-w-[1110px] mx-auto px-6 pb-14 lg:pb-24">
       <div className="bg-lgblue rounded-2xl p-6 lg:p-10 grid md:grid-cols-3 gap-8">
         <div><p className="text-orange text-xs font-bold tracking-widest uppercase">Visit our studio</p><address className="not-italic font-bold mt-3 leading-relaxed">1842 Alder Street<br />Portland, OR 97205<br />United States</address></div>
