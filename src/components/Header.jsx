@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import cartIcon from '../assets/icon-cart.svg';
-import avatar from '../assets/image-avatar.png';
 import menuIcon from '../assets/icon-menu.svg';
 import closeIcon from '../assets/icon-close.svg';
 import CartDrawer from './CartDrawer';
@@ -12,9 +11,11 @@ import { useStore } from '../context/StoreContext';
 const navLinks = [['Collections', '/collections/collections'], ['Men', '/collections/men'], ['Women', '/collections/women'], ['Wishlist', '/wishlist'], ['About', '/about']];
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { avatarUrl, configured, user } = useAuth();
+  const { configured, profileName, user } = useAuth();
   const { cartCount, cartOpen, setCartOpen } = useStore();
   const accountLabel = configured ? (user ? 'Your account' : 'Sign in') : 'Demo account';
+  const displayName = profileName || user?.user_metadata?.full_name || user?.email || (configured ? 'Sign in' : 'Alex');
+  const accountInitial = displayName.trim().charAt(0).toUpperCase();
   return <header className="relative z-30 bg-white">
     <div className="max-w-[1110px] mx-auto flex items-center border-b border-gblue/40 px-6 min-h-17 lg:min-h-0">
       <div className="flex items-center gap-4 lg:gap-14">
@@ -27,7 +28,9 @@ export default function Header() {
           <img src={cartIcon} alt="" className="w-6" />
           {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-orange text-white text-[10px] font-bold rounded-full min-w-5 h-4 px-1 flex items-center justify-center">{cartCount}</span>}
         </button>
-        <Link to="/account"><img src={avatarUrl || avatar} alt={accountLabel} className="w-6 h-6 lg:w-12 lg:h-12 object-cover rounded-full hover:ring-2 hover:ring-orange transition" /></Link>
+        <Link to="/account" aria-label={accountLabel} className="w-7 h-7 lg:w-12 lg:h-12 bg-pale-orange text-orange font-bold rounded-full flex items-center justify-center hover:ring-2 hover:ring-orange transition">
+          <span aria-hidden="true" className="text-sm lg:text-lg">{accountInitial}</span>
+        </Link>
       </div>
     </div>
     {cartOpen && <CartDrawer onClose={() => setCartOpen(false)} />}

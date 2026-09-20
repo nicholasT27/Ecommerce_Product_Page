@@ -83,7 +83,7 @@ configuration. Its simulated user is `alex@example.com`.
 - Save and remove wishlist items
 - Complete a no-payment checkout that reserves inventory and creates an order
 - Create an account, sign in/out, and save profile and delivery details with Supabase
-- Upload a JPG, PNG, or WebP profile image that appears in the header account circle
+- Show the signed-in customer's first initial in the header account circle
 - View confirmation details and personal order history
 
 No payment details are collected and no payment gateway is integrated.

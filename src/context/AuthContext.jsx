@@ -5,18 +5,15 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [profileName, setProfileName] = useState('');
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const userId = session?.user?.id;
 
-  const refreshAvatar = useCallback(async () => {
-    if (!supabase || !userId) { setAvatarUrl(null); return; }
-    const { data, error } = await supabase.from('profiles').select('avatar_path, updated_at').eq('id', userId).maybeSingle();
-    if (error || !data?.avatar_path) { setAvatarUrl(null); return; }
-    const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(data.avatar_path);
-    const version = encodeURIComponent(data.updated_at || Date.now());
-    setAvatarUrl(`${publicData.publicUrl}?v=${version}`);
-  }, [userId]);
+  const refreshProfile = useCallback(async () => {
+    if (!supabase || !userId) { setProfileName(''); return; }
+    const { data } = await supabase.from('profiles').select('full_name').eq('id', userId).maybeSingle();
+    setProfileName(data?.full_name || session?.user?.user_metadata?.full_name || '');
+  }, [session?.user?.user_metadata?.full_name, userId]);
 
   useEffect(() => {
     if (!supabase) return;
@@ -31,7 +28,7 @@ export function AuthProvider({ children }) {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  useEffect(() => { Promise.resolve().then(refreshAvatar); }, [refreshAvatar]);
+  useEffect(() => { Promise.resolve().then(refreshProfile); }, [refreshProfile]);
 
   const signIn = async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -51,7 +48,7 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   };
 
-  return <AuthContext.Provider value={{ configured: isSupabaseConfigured, session, user: session?.user ?? null, avatarUrl, refreshAvatar, loading, signIn, signUp, signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ configured: isSupabaseConfigured, session, user: session?.user ?? null, profileName, refreshProfile, loading, signIn, signUp, signOut }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);

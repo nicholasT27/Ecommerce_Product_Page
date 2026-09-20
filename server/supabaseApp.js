@@ -85,14 +85,14 @@ app.get('/api/account', async (req, res, next) => {
     let profile = unwrap(await client.from('profiles').select('*').eq('id', user.id).maybeSingle());
     if (!profile) profile = unwrap(await client.from('profiles').upsert({ id: user.id, full_name: user.user_metadata?.full_name || '' }).select().single());
     const orders = unwrap(await client.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false }));
-    res.json({ id: user.id, name: profile.full_name, email: user.email, phone: profile.phone, address: profile.address, city: profile.city, postalCode: profile.postal_code, avatarPath: profile.avatar_path, orders: orders.map((order) => ({ ...order, total: (order.subtotal_cents + order.shipping_cents) / 100 })) });
+    res.json({ id: user.id, name: profile.full_name, email: user.email, phone: profile.phone, address: profile.address, city: profile.city, postalCode: profile.postal_code, orders: orders.map((order) => ({ ...order, total: (order.subtotal_cents + order.shipping_cents) / 100 })) });
   } catch (error) { next(error); }
 });
 app.patch('/api/account', async (req, res, next) => {
   try {
     const { client, user } = await requireUser(req);
     const profile = unwrap(await client.from('profiles').upsert({ id: user.id, full_name: req.body.fullName || '', phone: req.body.phone || '', address: req.body.address || '', city: req.body.city || '', postal_code: req.body.postalCode || '', updated_at: new Date().toISOString() }).select().single());
-    res.json({ name: profile.full_name, phone: profile.phone, address: profile.address, city: profile.city, postalCode: profile.postal_code, avatarPath: profile.avatar_path });
+    res.json({ name: profile.full_name, phone: profile.phone, address: profile.address, city: profile.city, postalCode: profile.postal_code });
   } catch (error) { next(error); }
 });
 app.get('/api/orders/:orderNumber', async (req, res, next) => { try { const { client, user } = await requireUser(req); const order = unwrap(await client.from('orders').select('*, items:order_items(*)').eq('user_id', user.id).eq('order_number', req.params.orderNumber).single()); res.json({ ...order, total: (order.subtotal_cents + order.shipping_cents) / 100 }); } catch (error) { next(error); } });
