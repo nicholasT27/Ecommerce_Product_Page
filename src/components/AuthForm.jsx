@@ -18,7 +18,7 @@ export default function AuthForm() {
       }
     } catch (err) { setError(err.message); } finally { setBusy(false); }
   };
-  return <div className="max-w-md bg-lgblue rounded-2xl p-6 lg:p-8">
+  return <div className="w-full max-w-md mx-auto bg-lgblue rounded-2xl p-6 lg:p-8">
     <div className="grid grid-cols-2 bg-white rounded-xl p-1 mb-6"><button type="button" onClick={() => setMode('signin')} className={`rounded-lg py-2 font-bold ${mode === 'signin' ? 'bg-vdblue text-white' : ''}`}>Sign in</button><button type="button" onClick={() => setMode('signup')} className={`rounded-lg py-2 font-bold ${mode === 'signup' ? 'bg-vdblue text-white' : ''}`}>Create account</button></div>
     <form onSubmit={submit} className="space-y-4">
       {mode === 'signup' && <label className="block"><span className="font-bold text-sm block mb-2">Full name</span><input required value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} className="w-full border border-gblue rounded-xl px-4 py-3" /></label>}
