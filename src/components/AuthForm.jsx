@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { DUPLICATE_EMAIL_MESSAGE } from '../lib/auth';
 
 export default function AuthForm() {
   const [mode, setMode] = useState('signin');
@@ -16,7 +17,10 @@ export default function AuthForm() {
         const data = await signUp(form.email, form.password, form.fullName);
         if (!data.session) setMessage('Check your email to confirm your account, then sign in.');
       }
-    } catch (err) { setError(err.message); } finally { setBusy(false); }
+    } catch (err) {
+      setError(err.message);
+      if (err.message === DUPLICATE_EMAIL_MESSAGE) window.alert(err.message);
+    } finally { setBusy(false); }
   };
   return <div className="w-full max-w-md mx-auto bg-lgblue rounded-2xl p-6 lg:p-8">
     <div className="grid grid-cols-2 bg-white rounded-xl p-1 mb-6"><button type="button" onClick={() => setMode('signin')} className={`rounded-lg py-2 font-bold ${mode === 'signin' ? 'bg-vdblue text-white' : ''}`}>Sign in</button><button type="button" onClick={() => setMode('signup')} className={`rounded-lg py-2 font-bold ${mode === 'signup' ? 'bg-vdblue text-white' : ''}`}>Create account</button></div>

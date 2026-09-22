@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { DUPLICATE_EMAIL_MESSAGE, isDuplicateSignUp, normalizeEmail } from '../lib/auth';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
@@ -35,11 +36,16 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   };
   const signUp = async (email, password, fullName) => {
+    const normalizedEmail = normalizeEmail(email);
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
-      options: { data: { full_name: fullName } },
+      options: { data: { full_name: fullName.trim() } },
     });
+
+    // Supabase may hide an existing account behind an empty identities array
+    // when email confirmation is enabled, so handle both duplicate responses.
+    if (isDuplicateSignUp(data, error)) throw new Error(DUPLICATE_EMAIL_MESSAGE);
     if (error) throw error;
     return data;
   };
