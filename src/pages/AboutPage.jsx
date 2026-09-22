@@ -54,6 +54,18 @@ export default function AboutPage() {
       <p className="text-xs text-dgblue mt-4">Sneakers Supply Co. and all company details on this page are fictional and created for this ecommerce demonstration.</p>
     </section>
 
+    {/* Portfolio context and direct access to the deployed full-stack demo */}
+    <section className="max-w-[1110px] mx-auto px-6 pb-14 lg:pb-24">
+      <div className="border border-gblue rounded-2xl p-6 lg:p-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="max-w-2xl">
+          <p className="text-orange text-xs font-bold tracking-widest uppercase">About this demo</p>
+          <h2 className="text-2xl lg:text-3xl font-bold mt-3">A database-backed ecommerce prototype.</h2>
+          <p className="text-dgblue leading-relaxed mt-3">This portfolio project connects a responsive React storefront to an Express API and Supabase database. Its catalog, accounts, carts, wishlists, inventory, and simulated orders were expanded and tested with Codex as a development collaborator.</p>
+        </div>
+        <a href="https://ecommerce-product-page-five-ashen.vercel.app" target="_blank" rel="noreferrer" className="shrink-0 bg-vdblue text-white rounded-xl px-7 py-4 text-center font-bold hover:bg-vdblue/85 transition">View live website</a>
+      </div>
+    </section>
+
     <section className="bg-pale-orange"><div className="max-w-[1110px] mx-auto px-6 py-14 lg:py-18 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"><div><p className="text-orange text-sm font-bold tracking-widest uppercase">Find your pair</p><h2 className="text-3xl lg:text-4xl font-bold mt-2">Ready for the next step?</h2></div><Link to="/" className="bg-vdblue text-white rounded-xl px-8 py-4 font-bold hover:bg-vdblue/85 transition">Shop all sneakers</Link></div></section>
   </main>;
 }

@@ -2,6 +2,13 @@
 
 A responsive, full-stack ecommerce prototype expanded from the original product-page challenge. The existing visual language, desktop product layout, mobile gallery, and hamburger navigation are preserved while the experience now supports browsing through simulated order confirmation.
 
+## Project links
+
+- [Live ecommerce website](https://ecommerce-product-page-five-ashen.vercel.app) — Browse the seeded catalog, create a demo account, manage a cart and wishlist, and complete the no-payment checkout flow.
+- [Source repository](https://github.com/nicholasT27/Ecommerce_Product_Page) — Review the React, Express, Supabase, database migration, and test implementation.
+
+This portfolio project was expanded, connected to its backend, and tested with Codex as a development collaborator.
+
 ## Stack
 
 - React 19, React Router, Vite, and Tailwind CSS
