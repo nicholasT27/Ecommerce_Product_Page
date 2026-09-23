@@ -14,23 +14,63 @@ export default function AccountPage() {
   const [account, setAccount] = useState(null);
   const [profile, setProfile] = useState(blankProfile);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (loading || (configured && !user)) return;
-    api('/account').then((data) => {
-      setAccount(data);
-      setProfile({ fullName: data.name || '', phone: data.phone || '', address: data.address || '', city: data.city || '', postalCode: data.postalCode || '' });
-    });
-  }, [configured, loading, user]);
+
+    setError(null);
+
+    api('/account')
+      .then((data) => {
+        setAccount(data);
+        setProfile({
+          fullName: data.name || '',
+          phone: data.phone || '',
+          address: data.address || '',
+          city: data.city || '',
+          postalCode: data.postalCode || '',
+        });
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load your account.');
+      });
+  }, [configured, loading, user, retryCount]);
 
   if (loading) return <p className="text-center py-24">Loading account…</p>;
   if (configured && !user) return <main className="flex-1"><PageTitle centered eyebrow="Your account" title="Sign in to Sneakers">Create an account to keep your cart, wishlist, details, and orders securely connected.</PageTitle><div className="max-w-md mx-auto px-6 py-12"><AuthForm /></div></main>;
+
+  if (error) {
+    return (
+      <main>
+        <div className="max-w-md mx-auto px-6 py-24 text-center">
+          <p className="text-dgblue font-bold mb-2">Couldn't load your account</p>
+          <p className="text-sm text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => setRetryCount((c) => c + 1)}
+            className="bg-orange rounded-xl px-6 py-3 font-bold"
+          >
+            Try again
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   if (!account) return <p className="text-center py-24">Loading account…</p>;
 
   const saveProfile = async (event) => {
     event.preventDefault();
-    const updated = await api('/account', { method: 'PATCH', body: JSON.stringify(profile) });
-    setAccount((current) => ({ ...current, ...updated })); await refreshProfile(); setMessage('Details saved.');
+    try {
+      const updated = await api('/account', { method: 'PATCH', body: JSON.stringify(profile) });
+      setAccount((current) => ({ ...current, ...updated }));
+      await refreshProfile();
+      setMessage('Details saved.');
+    } catch (err) {
+      setMessage('');
+      setError(err.message || 'Failed to save your details.');
+    }
   };
 
   return <main>
