@@ -5,9 +5,14 @@ import PageTitle from '../components/PageTitle';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { money } from '../lib/assets';
-import { formatOrderDate } from '../lib/dates';
 
 const blankProfile = { fullName: '', phone: '', address: '', city: '', postalCode: '' };
+
+function formatOrderDate(rawDate) {
+  if (!rawDate) return '—';
+  const date = new Date(rawDate);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString();
+}
 
 export default function AccountPage() {
   const { configured, user, loading, refreshProfile, signOut } = useAuth();
@@ -134,7 +139,7 @@ export default function AccountPage() {
                       <td className="p-4">
                         <Link to={`/order/${order.order_number}`} className="text-orange font-bold">{order.order_number}</Link>
                       </td>
-                      <td className="p-4">{new Date(order.created_at.endsWith?.('Z') ? order.created_at : `${order.created_at}Z`).toLocaleDateString()}</td>
+                      <td className="p-4">{formatOrderDate(order.created_at)}</td>
                       <td className="p-4 capitalize">{order.status}</td>
                       <td className="p-4 font-bold">{money(order.total)}</td>
                     </tr>
