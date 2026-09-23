@@ -1,19 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import { productImages, productThumbs } from '../lib/assets';
 import prevIcon from "../assets/icon-previous.svg";
 import nextIcon from "../assets/icon-next.svg";
+import closeIcon from "../assets/icon-close.svg";
 
 const AUTO_ADVANCE_MS = 4500;
 
 function ProductGallery({ product }) {
     const [active, setActive] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const images = productImages(product.imageSet);
     const thumbs = productThumbs(product.imageSet);
 
-    // Move through every thumbnail automatically, restarting the timer after
-    // someone selects an image manually. Hovering or focusing pauses movement.
+    const openTriggerRef = useRef(null);
+    const closeButtonRef = useRef(null);
+
     useEffect(() => {
         if (isPaused || images.length < 2) return undefined;
         const timer = window.setTimeout(() => {
@@ -23,8 +26,38 @@ function ProductGallery({ product }) {
     }, [active, images.length, isPaused]);
 
     const prev = () => setActive((current) => (current - 1 + images.length) % images.length);
-
     const next = () => setActive((current) => (current + 1) % images.length);
+
+    const openLightbox = (e) => {
+        openTriggerRef.current = e.currentTarget; // remember what had focus
+        setIsLightboxOpen(true);
+    };
+
+    const closeLightbox = () => {
+        setIsLightboxOpen(false);
+        openTriggerRef.current?.focus(); // return focus where it came from
+    };
+
+    useEffect(() => {
+        if (!isLightboxOpen) return undefined;
+
+        // Move focus into the dialog once it renders
+        closeButtonRef.current?.focus();
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prev();
+            if (e.key === 'ArrowRight') next();
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [isLightboxOpen, images.length]);
 
     return (
         <div
@@ -35,56 +68,105 @@ function ProductGallery({ product }) {
         >
             {/* Main image + mobile arrows */}
             <div className="relative">
-                <img
-                    className="w-full lg:rounded-2xl"
-                    src={images[active]}
-                    alt={`${product.name}, view ${active + 1}`}
-                />
+                <button
+                    type="button"
+                    onClick={openLightbox}
+                    className="w-full cursor-pointer lg:cursor-zoom-in"
+                    aria-label="Open gallery view"
+                >
+                    <img
+                        className="w-full lg:rounded-2xl"
+                        src={images[active]}
+                        alt={`${product.name}, view ${active + 1}`}
+                    />
+                </button>
 
-            {/* Mobile-only arrows */}
-            <button
-                onClick={prev}
-                aria-label="Previous image"
-                className="lg:hidden absolute top-1/2 left-4 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:opacity-80">
-
+                <button
+                    onClick={prev}
+                    aria-label="Previous image"
+                    className="lg:hidden absolute top-1/2 left-4 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:opacity-80">
                     <img src={prevIcon} alt="" className="w-2" />
-            </button>
+                </button>
 
-            <button
-                onClick={next}
-                aria-label="Next image"
-                className="lg:hidden absolute top-1/2 right-4 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:opacity-80"
-            >
-              <img src={nextIcon} alt="" className="w-2" />
-            </button>
+                <button
+                    onClick={next}
+                    aria-label="Next image"
+                    className="lg:hidden absolute top-1/2 right-4 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:opacity-80"
+                >
+                    <img src={nextIcon} alt="" className="w-2" />
+                </button>
             </div>
-            
+
             {/* Thumbnails — hidden on mobile */}
             <div className="hidden lg:grid grid-cols-4 gap-7 mt-8">
                 {thumbs.map((thumb, i) => {
                     const isActive = i === active;
-
                     return (
                         <button
                             key={i}
                             onClick={() => setActive(i)}
                             aria-label={`Show image ${i + 1} of ${thumbs.length}`}
                             aria-current={isActive ? 'true' : undefined}
-                            className={`rounded-xl overflow-hidden transition ${isActive ? 'ring-2 ring-orange' : ''}`}    
+                            className={`rounded-xl overflow-hidden transition ${isActive ? 'ring-2 ring-orange' : ''}`}
                         >
-                            <img 
+                            <img
                                 src={thumb}
                                 alt={`Thumbnail ${i + 1}`}
-                                className={`w-full transition ${
-                                    isActive ? 'opacity-50' : 'hover:opacity-70'
-                                }`}
+                                className={`w-full transition ${isActive ? 'opacity-50' : 'hover:opacity-70'}`}
                             />
                         </button>
                     );
                 })}
             </div>
+
+            {/* Lightbox */}
+            {isLightboxOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4"
+                    onClick={closeLightbox}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={`${product.name} image gallery`}
+                >
+                    <div
+                        className="relative w-full max-w-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            ref={closeButtonRef}
+                            onClick={closeLightbox}
+                            aria-label="Close gallery view"
+                            className="absolute -top-12 right-0 w-8 h-8 flex items-center justify-center hover:opacity-70"
+                        >
+                            <img src={closeIcon} alt="" className="w-4" />
+                        </button>
+
+                        <img
+                            className="w-full rounded-2xl"
+                            src={images[active]}
+                            alt={`${product.name}, view ${active + 1}`}
+                        />
+
+                        <button
+                            onClick={prev}
+                            aria-label="Previous image"
+                            className="absolute top-1/2 -left-16 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:opacity-80"
+                        >
+                            <img src={prevIcon} alt="" className="w-2" />
+                        </button>
+
+                        <button
+                            onClick={next}
+                            aria-label="Next image"
+                            className="absolute top-1/2 -right-16 -translate-y-1/2 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:opacity-80"
+                        >
+                            <img src={nextIcon} alt="" className="w-2" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
 export default ProductGallery;
