@@ -6,6 +6,22 @@ import nextIcon from "../assets/icon-next.svg";
 import closeIcon from "../assets/icon-close.svg";
 
 const AUTO_ADVANCE_MS = 4500;
+const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+function usePrefersReducedMotion() {
+    const [prefersReduced, setPrefersReduced] = useState(false);
+
+    useEffect(() => {
+        const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+        setPrefersReduced(query.matches);
+
+        const handleChange = (e) => setPrefersReduced(e.matches);
+        query.addEventListener('change', handleChange);
+        return () => query.removeEventListener('change', handleChange);
+    }, []);
+
+    return prefersReduced;
+}
 
 function ProductGallery({ product }) {
     const [active, setActive] = useState(0);
@@ -13,41 +29,63 @@ function ProductGallery({ product }) {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const images = productImages(product.imageSet);
     const thumbs = productThumbs(product.imageSet);
+    const prefersReducedMotion = usePrefersReducedMotion();
 
     const openTriggerRef = useRef(null);
     const closeButtonRef = useRef(null);
+    const dialogRef = useRef(null);
+
+    const autoAdvanceDisabled = isPaused || prefersReducedMotion;
 
     useEffect(() => {
-        if (isPaused || images.length < 2) return undefined;
+        if (autoAdvanceDisabled || images.length < 2) return undefined;
         const timer = window.setTimeout(() => {
             setActive((current) => (current + 1) % images.length);
         }, AUTO_ADVANCE_MS);
         return () => window.clearTimeout(timer);
-    }, [active, images.length, isPaused]);
+    }, [active, images.length, autoAdvanceDisabled]);
 
     const prev = () => setActive((current) => (current - 1 + images.length) % images.length);
     const next = () => setActive((current) => (current + 1) % images.length);
 
     const openLightbox = (e) => {
-        openTriggerRef.current = e.currentTarget; // remember what had focus
+        openTriggerRef.current = e.currentTarget;
         setIsLightboxOpen(true);
     };
 
     const closeLightbox = () => {
         setIsLightboxOpen(false);
-        openTriggerRef.current?.focus(); // return focus where it came from
+        openTriggerRef.current?.focus();
     };
 
     useEffect(() => {
         if (!isLightboxOpen) return undefined;
 
-        // Move focus into the dialog once it renders
         closeButtonRef.current?.focus();
 
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'Escape') {
+                closeLightbox();
+                return;
+            }
             if (e.key === 'ArrowLeft') prev();
             if (e.key === 'ArrowRight') next();
+
+            if (e.key === 'Tab' && dialogRef.current) {
+                const focusable = dialogRef.current.querySelectorAll(FOCUSABLE_SELECTOR);
+                if (focusable.length === 0) return;
+
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
         };
 
         document.addEventListener('keydown', handleKeyDown);
@@ -129,6 +167,7 @@ function ProductGallery({ product }) {
                     aria-label={`${product.name} image gallery`}
                 >
                     <div
+                        ref={dialogRef}
                         className="relative w-full max-w-lg"
                         onClick={(e) => e.stopPropagation()}
                     >
